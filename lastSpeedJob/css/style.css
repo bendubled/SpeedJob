@@ -1,0 +1,11 @@
+.design_map{
+    width:750px;
+    height: 350px;
+    margin: auto;
+}
+
+#map-canvas{
+    height:370px !important;
+}
+h1{
+    text-align: center;}
