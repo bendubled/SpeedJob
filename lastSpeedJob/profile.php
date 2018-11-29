@@ -1,22 +1,19 @@
 
 
 <?php
-$_COOKIE;
-$Pseudo = $_COOKIE['pseudo'] ;
+require 'header.php';
+require 'functions.php';
+require_once 'db.php';
 require('id_connexion.php');
-$reponse = $bdd->query("SELECT * FROM membre_part WHERE pseudo = '". $Pseudo ."'");
-
-           
-       
-                      
-echo  $cookiePseudo ;
-    ?>                       
-
-<?php
-                       
- 
+logged_only();
+$util = $_GET["user"];
 ?>
-   <a  href="index.php" >Accueil</a>
+<div>PROFILE de <?php  echo $util; ?></div>
 
+<?php 
 
+  $reponse = $bdd->query('SELECT * FROM users WHERE username = "'.$util.'"');
+
+  print_r($reponse->fetch());
+?>
 

@@ -85,7 +85,7 @@ var ui = H.ui.UI.createDefault(map, defaultLayers);
 //addMarkersToMap(map);
 
   </script>
-		</section>
+	
                 <section>
                     <div>
                      <?php
@@ -97,7 +97,7 @@ var ui = H.ui.UI.createDefault(map, defaultLayers);
 ?>
 
  
-                        <strong>Liste</strong> : <?php echo $donnees['username']; ?><?php print_r($donnees);?><br />
+                        <strong>Liste</strong> : <div name='id_com' class='users'><?php echo $donnees['username']; ?></div><?php print_r($donnees);?><br />
     VILLE : <?php echo $donnees['ville']; ?><br />POSTE<?php echo $donnees['id']; ?> <br />
    <br />MAIL <?php echo $donnees['email']; ?> 
     <?php
@@ -106,22 +106,31 @@ var ui = H.ui.UI.createDefault(map, defaultLayers);
     <?php $longitude = $donnees['longitude'] ;
     
     ?>
+   
   
-        <INPUT type='text' SIZE='30'  class='lattitu' id='latitudeAll' name='lattitu' VALUE="<?php echo $latitude; ?>"/>
-        <INPUT type='text' SIZE='30'  class='longit' id='longitudeAll' name='longit' VALUE="<?php echo $longitude; ?>"/>
+        <INPUT type='hidden' SIZE='30'  class='lattitu' id='latitudeAll' name='lattitu' VALUE="<?php echo $latitude; ?>"/>
+        <INPUT type='hidden' SIZE='30'  class='longit' id='longitudeAll' name='longit' VALUE="<?php echo $longitude; ?>"/>
         <?php
       
 //            echo $latitude;
 //            echo $latitude;
 //            echo $longitude;
             ?>
- 
+ <?php
+
+}
+
+
+
+?>
    <script>
        var i =0;
 for(i=0;i<3;i++){
-    console.log(i);
+    
  var val1 = document.getElementsByName("lattitu")[i].value;
  var val2 = document.getElementsByName("longit")[i].value;
+
+ var user = document.getElementsByClassName("users")[i].innerHTML;
 
 var marker = new H.map.Marker({lat:val2, lng:val1});
 //var marker1 = new H.map.Marker({lat:val2, lng:val1});
@@ -137,11 +146,13 @@ var marker = new H.map.Marker({lat:val2, lng:val1});
 //  }, false);
  
    function addMarkerToGroup(group, coordinate, html) {
-  var marker = new H.map.Marker(coordinate);
+  var marker = new H.map.Marker(coordinate);        
   // add custom data to the marker
   marker.setData(html);
   group.addObject(marker);
+
 }
+
 
 /**
  * Add two markers showing the position of Liverpool and Manchester City football clubs.
@@ -149,43 +160,89 @@ var marker = new H.map.Marker({lat:val2, lng:val1});
  * @param  {H.Map} map      A HERE Map instance within the application
  */
 function addInfoBubble(map) {
+    
+
+  
   var marker = new H.map.Group();
 
   map.addObject(marker);
 
   // add 'tap' event listener, that opens info bubble, to the group
- marker.addEventListener('tap', function (evt) {
+ marker.addEventListener('pointermove', function (evt) {
     // event target is the marker itself, group is a parent event target
     // for all objects that it contains
     var bubble =  new H.ui.InfoBubble(evt.target.getPosition(), {
+        
       // read custom data
       content: evt.target.getData()
+      
     });
+    ui.getBubbles().forEach(bub => ui.removeBubble(bub));
     // show info bubble
     ui.addBubble(bubble);
+     
   }, false);
+
+
+  console.log(val1, val2, user);
+  
 addMarkerToGroup(marker, {lat:val2, lng:val1},
-    '<div><a href=\'http://www.mcfc.co.uk\' >Manchester City</a>' +
-    '</div><div ><?php echo $donnees['id']; ?></div>');
- 
+  
+    '<p "><img style="height:50px;" src="image/avatar.jpg"></p><div style="background:white;height: 50px;"><a href="profile.php?user=' + user + '">'+ user +'</a></div>');
+//    document.getElementsByClassName(H_ui)=val1;
 
 }
 
+
+function addDraggableMarker(map, behavior){
+
+//  var marker = new H.map.Marker({lat:val2, lng:val1});
+//  // Ensure that the marker can receive drag events
+//  marker.draggable = true;
+//  map.addObject(marker);
+
+  // disable the default draggability of the underlying map
+  // when starting to drag a marker object:
+  map.addEventListener('dragstart', function(ev) {
+      console.log('xxxxx');
+    var target = ev.target;
+    
+    if (target instanceof H.map.Marker) {
+      behavior.disable();
+    }
+  }, false);
+
+
+  // re-enable the default draggability of the underlying map
+  // when dragging has completed
+  map.addEventListener('dragend', function(ev) {
+    var target = ev.target;
+    if (target instanceof mapsjs.map.Marker) {
+      behavior.enable();
+    }
+  }, false);
+
+  // Listen to the drag event and move the position of the marker
+  // as necessary
+   map.addEventListener('drag', function(ev) {
+    var target = ev.target,
+        pointer = ev.currentPointer;
+    if (target instanceof mapsjs.map.Marker) {
+      target.setPosition(map.screenToGeo(pointer.viewportX, pointer.viewportY));
+    }
+  }, false);
+} 
 addInfoBubble(map);
-  
- }
+addDraggableMarker(map, behavior);
+}
+
+
 // map.addObject(marker1);
 
 
 
    </script>
-<?php
 
-}
-
-$reponse->closeCursor(); // Termine le traitement de la requ�te
-
-?>
                    </div>
                     <form action="recherche.php" method="post">
 <p>
